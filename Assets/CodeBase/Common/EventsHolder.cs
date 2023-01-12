@@ -7,5 +7,7 @@ namespace CodeBase.Common
     {
         public UnityEvent startEvent;
         public UnityEvent dieEvent;
+        public UnityEvent gamePausedEvent;
+        public UnityEvent gameUnPauseEvent;
     }
 }

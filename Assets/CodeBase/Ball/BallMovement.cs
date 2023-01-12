@@ -7,16 +7,15 @@ namespace CodeBase.Ball
     [RequireComponent(typeof(Rigidbody))]
     public class BallMovement : MonoBehaviour
     {
-        public event Action<int> DirectionChange;
-        
         [SerializeField] private float speed;
+        [SerializeField] private BallControl ballControl;
 
         private Rigidbody _rigidbody;
         private Vector3 _moveDir = Vector3.forward;
         private bool _enabled;
-        private int _dirChangeCount;
 
-        private EventsHolder EventsHolder => EventsHolder.Instance;
+        private static  EventsHolder EventsHolder => EventsHolder.Instance;
+        private static  SoundsHolder SoundsHolder => SoundsHolder.Instance;
 
         private void Start()
         {
@@ -45,9 +44,9 @@ namespace CodeBase.Ball
 
         private void ChangeDirection()
         {
-            _moveDir = GetMoveDirection();
-            _dirChangeCount++;
-            DirectionChange?.Invoke(_dirChangeCount);
+            _moveDir = GetMoveDirection(); 
+            ballControl.AddScore(1);
+            SoundsHolder.tapSound.Play();
         }
 
         private Vector3 GetMoveDirection() => 
@@ -58,12 +57,16 @@ namespace CodeBase.Ball
         private void OnEnable()
         {
             EventsHolder.startEvent.AddListener(() => SwitchMoveState(true));
+            EventsHolder.gamePausedEvent.AddListener(() => SwitchMoveState(false));
+            EventsHolder.gameUnPauseEvent.AddListener(() => SwitchMoveState(true));
             EventsHolder.dieEvent.AddListener(() => SwitchMoveState(false));
         }
 
         private void OnDisable()
         {
             EventsHolder?.startEvent.RemoveListener(() => SwitchMoveState(true));
+            EventsHolder?.gamePausedEvent.RemoveListener(() => SwitchMoveState(false));
+            EventsHolder?.gameUnPauseEvent.RemoveListener(() => SwitchMoveState(true));
             EventsHolder?.dieEvent.RemoveListener(() => SwitchMoveState(false));
         }
     }

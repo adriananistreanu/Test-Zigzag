@@ -3,32 +3,36 @@ using CodeBase.Ball;
 using CodeBase.Common;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CodeBase.UI
 {
-    [RequireComponent(typeof(UIPanel))]
-    public class InGameUI : MonoBehaviour
+    public class InGameUI : UIWindow
     {
-        [SerializeField] private BallMovement ballMovement;
+        [SerializeField] private BallControl ballControl;
         [SerializeField] private TextMeshProUGUI directionChangeCounter;
+        [SerializeField] private Button pauseBtn;
+        [SerializeField] private Button settingsBtn;
+        [SerializeField] private UIWindow pauseWindow;
+        [SerializeField] private UIWindow settingsWindow;
         
-        private UIPanel _panel;
-        private EventsHolder EventsHolder => EventsHolder.Instance;
+        private static  EventsHolder EventsHolder => EventsHolder.Instance;
         
         private void Start()
         {
-            _panel ??= GetComponent<UIPanel>();
             AddListeners();
-        }
-
-        private void ActivatePanel()
-        {
-            _panel.SwitchPanelByParameter(true);
         }
 
         private void AddListeners()
         {
-            ballMovement.DirectionChange += OnDirectionChange;
+            ballControl.ScoreChange += OnDirectionChange;
+            pauseBtn.onClick.AddListener(() => pauseWindow.ActivateWindow());
+            settingsBtn.onClick.AddListener(() => settingsWindow.ActivateWindow());
+        }
+
+        private void RemoveListeners()
+        {
+            ballControl.ScoreChange -= OnDirectionChange;
         }
 
         private void OnDirectionChange(int count)
@@ -36,19 +40,22 @@ namespace CodeBase.UI
             directionChangeCounter.text = count.ToString();
         }
 
-        private void RemoveListeners()
+        public override void DeactivateWindow()
         {
-            ballMovement.DirectionChange -= OnDirectionChange;
+            base.DeactivateWindow();
+            pauseBtn.interactable = false;
         }
 
         private void OnEnable()
         {
-            EventsHolder.startEvent.AddListener(ActivatePanel);
+            EventsHolder.startEvent.AddListener(ActivateWindow);
+            EventsHolder.dieEvent.AddListener(DeactivateWindow);
         }
 
         private void OnDisable()
         {
-            EventsHolder?.startEvent.RemoveListener(ActivatePanel);
+            EventsHolder?.startEvent.RemoveListener(ActivateWindow);
+            EventsHolder?.dieEvent.RemoveListener(DeactivateWindow);
         }
 
         private void OnDestroy()

@@ -1,12 +1,12 @@
 ﻿using Cinemachine;
 using UnityEngine;
 
-namespace CodeBase.Camera
+namespace CodeBase.CameraLogic
 { 
     [SaveDuringPlay] [AddComponentMenu("")]
-    public class LockCameraY : CinemachineExtension
+    public class LockCameraX : CinemachineExtension
     {
-        public float yPosition = 50f;
+        public float xPosition = 50f;
 
         protected override void PostPipelineStageCallback(CinemachineVirtualCameraBase vcam, 
             CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
@@ -14,7 +14,7 @@ namespace CodeBase.Camera
             if (stage == CinemachineCore.Stage.Body)
             {
                 var pos = state.RawPosition;
-                pos.y = yPosition;
+                pos.x = xPosition;
                 state.RawPosition = pos;
             }
         }
