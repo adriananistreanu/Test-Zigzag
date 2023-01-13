@@ -6,9 +6,9 @@ namespace CodeBase.UI
     [RequireComponent(typeof(CanvasGroup))]
     public class UIWindow : MonoBehaviour
     {
-        protected CanvasGroup _panel = null;
+        private CanvasGroup _panel = null;
 
-        protected void Awake()
+        protected virtual void Awake()
         {
             _panel ??= GetComponent<CanvasGroup>();
         }
@@ -38,7 +38,5 @@ namespace CodeBase.UI
             _panel.interactable = enablePanel;
             _panel.DOFade(enablePanel ? 1 : 0, duration);
         }
-
-        public bool PanelActive() => _panel.alpha == 1f;
     }
 }

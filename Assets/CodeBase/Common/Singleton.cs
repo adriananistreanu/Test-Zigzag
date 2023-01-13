@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace CodeBase.Helpers
+namespace CodeBase.Common
 {
     public class Singleton<T> : MonoBehaviour where T: MonoBehaviour
     {

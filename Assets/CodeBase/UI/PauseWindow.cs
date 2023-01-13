@@ -1,5 +1,4 @@
-﻿using System;
-using CodeBase.Common;
+﻿using CodeBase.Common;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +6,11 @@ namespace CodeBase.UI
 {
     public class PauseWindow : UIWindow
     {
+        [SerializeField] private Button restartBtn;
         [SerializeField] private Button resumeBtn;
+        [SerializeField] private Button generalPauseBtn;
+
+        private SoundsHolder SoundsHolder => SoundsHolder.Instance;
         
         private void Start()
         {
@@ -17,19 +20,34 @@ namespace CodeBase.UI
         public override void ActivateWindow()
         {
             base.ActivateWindow();
-            StartCoroutine(LevelLoader.PauseGame(0.5f));
+            LevelLoader.PauseGame();
+            generalPauseBtn.gameObject.SetActive(false);
+        }
+
+        public override void DeactivateWindow()
+        {
+            SwitchPanelByParameter(false, 0f);
         }
 
         private void AddListeners()
         {
             resumeBtn.onClick.AddListener(OnResumeBtnClick);
+            restartBtn.onClick.AddListener(OnRestartBtnClick);
         }
 
         private void OnResumeBtnClick()
         {
             LevelLoader.UnpauseGame();
-            SwitchPanelByParameter(false, 0f);
+            DeactivateWindow();
+            generalPauseBtn.gameObject.SetActive(true);
+            SoundsHolder.clickSound.Play();
         }
-        
+
+        private void OnRestartBtnClick()
+        {
+            SoundsHolder.clickSound.Play();
+            LevelLoader.UnpauseGame();
+            LevelLoader.Retry();
+        }
     }
 }

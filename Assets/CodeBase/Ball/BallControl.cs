@@ -1,8 +1,9 @@
 ﻿using System;
 using CodeBase.Common;
+using CodeBase.Helpers;
+using CodeBase.LevelGeneration;
 using DG.Tweening;
 using TMPro;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace CodeBase.Ball
@@ -22,9 +23,7 @@ namespace CodeBase.Ball
         private int _collectedGems;
         private bool _dead;
         private const int CollectScoreCount = 2;
-        private const string GemsCountSaveKey = "GemsCount";
-        private const string BestScoreSaveKey = "BestScore";
-        
+
         private static EventsHolder EventsHolder => EventsHolder.Instance;
         private static SoundsHolder SoundsHolder => SoundsHolder.Instance;
 
@@ -41,11 +40,10 @@ namespace CodeBase.Ball
         {
             RaycastHit hit;
 
-            if (Grounded(out hit)) 
+            if (Grounded(out hit))
                 DestroyPreviousPlatform(hit);
-            else if(!_dead) 
+            else if (!_dead)
                 Die();
-
         }
 
         private void OnTriggerEnter(Collider other)
@@ -58,8 +56,8 @@ namespace CodeBase.Ball
 
         private bool Grounded(out RaycastHit hit)
         {
-            return Physics.Raycast(transform.position, Vector3.down, out hit, 1f, 
-                1<< LayerMask.NameToLayer("Ground"));
+            return Physics.Raycast(transform.position, Vector3.down, out hit, 1f,
+                1 << LayerMask.NameToLayer("Ground"));
         }
 
         private void DestroyPreviousPlatform(RaycastHit hit)
@@ -79,7 +77,7 @@ namespace CodeBase.Ball
         private void IncrementPlatformPassed()
         {
             _platformsPassed++;
-            if(_platformsPassed >= endlessGeneration.RateToSpawn)
+            if (_platformsPassed >= endlessGeneration.RateToSpawn)
                 endlessGeneration.SpawnNextPlatforms();
         }
 
@@ -105,14 +103,14 @@ namespace CodeBase.Ball
             DisplayScoreGemText(gem.transform);
             SoundsHolder.collectSound.Play();
         }
-        
+
         private void DisplayScoreGemText(Transform target)
         {
-            var textInstance = Instantiate(collectScoreText, 
-                target.position + collectScoreText.transform.position, 
+            var textInstance = Instantiate(collectScoreText,
+                target.position + collectScoreText.transform.position,
                 collectScoreText.transform.rotation);
             textInstance.text = "+" + CollectScoreCount;
-            textInstance.transform.LookAt(2* textInstance.transform.position - Camera.main.transform.position);
+            textInstance.transform.LookAt(2 * textInstance.transform.position - Camera.main.transform.position);
             textInstance.transform.DOMoveY(textInstance.transform.position.y + 5f, 1f)
                 .OnComplete(() => { Destroy(textInstance.gameObject); });
             textInstance.DOFade(0f, 1f);
@@ -122,29 +120,28 @@ namespace CodeBase.Ball
         {
             _dead = true;
             EventsHolder.dieEvent?.Invoke();
-            Destroy(gameObject,5f);
+            Destroy(gameObject, 5f);
             SoundsHolder.loseSound.Play();
         }
 
         private void SaveGems()
         {
-            PlayerPrefs.SetInt(GemsCountSaveKey, _collectedGems);
+            PlayerPrefs.SetInt(SaveKeys.GemsCountSaveKey, _collectedGems);
         }
 
         private void SaveScore()
         {
             if (_score > _bestScore)
             {
-                PlayerPrefs.SetInt(BestScoreSaveKey, _score);
+                PlayerPrefs.SetInt(SaveKeys.BestScoreSaveKey, _score);
                 _bestScore = _score;
             }
-               
         }
 
         private void LoadSaves()
         {
-            _collectedGems = PlayerPrefs.GetInt(GemsCountSaveKey, _collectedGems);
-            _bestScore = PlayerPrefs.GetInt(BestScoreSaveKey, _bestScore);
+            _collectedGems = PlayerPrefs.GetInt(SaveKeys.GemsCountSaveKey, _collectedGems);
+            _bestScore = PlayerPrefs.GetInt(SaveKeys.BestScoreSaveKey, _bestScore);
         }
     }
 }

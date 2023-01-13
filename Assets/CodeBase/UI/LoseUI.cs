@@ -21,6 +21,13 @@ namespace CodeBase.UI
             AddListeners();
         }
 
+        public override void ActivateWindow()
+        {
+            base.ActivateWindow();
+            scoreText.text = ballControl.Score.ToString();
+            bestScoreText.text = ballControl.BestScore.ToString();
+        }
+
         private void AddListeners()
         {
             retryButton.onClick.AddListener(OnRetryBtnClick);
@@ -32,14 +39,6 @@ namespace CodeBase.UI
             SoundsHolder.clickSound.Play();
         }
 
-        public override void ActivateWindow()
-        {
-            base.ActivateWindow();
-            scoreText.text = ballControl.Score.ToString();
-            bestScoreText.text = ballControl.BestScore.ToString();
-        }
-        
-        
         private void OnEnable()
         {
             EventsHolder.dieEvent.AddListener(ActivateWindow);
